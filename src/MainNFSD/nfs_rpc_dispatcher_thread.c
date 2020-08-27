@@ -44,6 +44,8 @@
 #endif
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <sys/socketvar.h>
+#include <netinet/tcp_var.h>
 #include <assert.h>
 #include "hashtable.h"
 #include "log.h"
@@ -900,7 +902,7 @@ static int alloc_socket_setopts(int p)
 		}
 
 		if (nfs_cp->tcp_keepidle) {
-			if (setsockopt(tcp_socket[p], IPPROTO_TCP, TCP_KEEPIDLE,
+			if (setsockopt(tcp_socket[p], IPPROTO_TCP, TCPCTL_KEEPIDLE,
 				       &nfs_cp->tcp_keepidle,
 				       sizeof(nfs_cp->tcp_keepidle))) {
 				LogWarn(COMPONENT_DISPATCH,

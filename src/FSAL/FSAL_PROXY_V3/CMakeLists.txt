@@ -18,7 +18,7 @@ add_sanitizers(fsalproxy_v3)
 target_link_libraries(fsalproxy_v3
   ganesha_nfsd
   ${SYSTEM_LIBRARIES}
-  "-Wl,--no-undefined"
+  
 )
 
 set_target_properties(fsalproxy_v3 PROPERTIES VERSION 4.2.0 SOVERSION 4)

@@ -37,7 +37,7 @@
 #include <rpc/rpc.h>
 #include <rpc/auth_gss.h>
 #include <krb5.h>
-#include <gssapi/gssapi.h>
+#include <GSS/gssapi.h>
 
 struct gssd_k5_kt_princ;
 

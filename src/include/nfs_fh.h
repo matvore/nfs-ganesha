@@ -33,7 +33,7 @@
 #ifndef NFS_FH_H
 #define NFS_FH_H
 
-#ifndef __FreeBSD__
+#if !defined(__FreeBSD__) && !defined(__APPLE__)
 #include "byteswap.h"
 #endif
 

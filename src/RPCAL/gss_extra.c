@@ -42,8 +42,8 @@
 #include <gssapi.h>
 #define gss_nt_service_name GSS_C_NT_HOSTBASED_SERVICE
 #else
-#include <gssapi/gssapi.h>
-#include <gssapi/gssapi_generic.h>
+#include <GSS/gssapi.h>
+#include <GSS/gssapi_generic.h>
 #endif
 
 #include "nfs_core.h"

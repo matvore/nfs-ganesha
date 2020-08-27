@@ -226,7 +226,7 @@ gsh_realloc__(void *p, size_t n,
 		p_; \
 	})
 
-#ifdef _GNU_SOURCE
+#if defined(_GNU_SOURCE) && !defined(__APPLE__)
 #define gsh_strdupa(src) strdupa(src)
 #else
 #define gsh_strdupa(src) ({\

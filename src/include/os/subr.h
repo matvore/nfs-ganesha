@@ -49,7 +49,15 @@ struct vfs_dirent {
 	char *vd_name;
 };
 
-int vfs_readents(int fd, char *buf, unsigned int bcount, off_t *basepp);
+struct seekloc {
+#if defined(__APPLE__)
+	long loc;
+#else
+	off_t loc;
+#endif
+};
+
+int vfs_readents(int fd, char *buf, unsigned int bcount, struct seekloc *);
 bool to_vfs_dirent(char *buf, int bpos, struct vfs_dirent *vd, off_t base);
 void setuser(uid_t uid);
 void setgroup(gid_t gid);

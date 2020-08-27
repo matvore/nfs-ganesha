@@ -22,7 +22,7 @@ target_link_libraries(fsalmem
   ganesha_nfsd
   ${SYSTEM_LIBRARIES}
   ${LTTNG_LIBRARIES}
-  "-Wl,--no-undefined"
+  
 )
 
 set_target_properties(fsalmem PROPERTIES VERSION 4.2.0 SOVERSION 4)

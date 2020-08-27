@@ -33,7 +33,7 @@ target_link_libraries(fsalgluster
   ${SYSTEM_LIBRARIES}
   ${GFAPI_LIBRARIES}
   ${LTTNG_LIBRARIES}
-  "-Wl,--no-undefined"
+  
 )
 
 set_target_properties(fsalgluster PROPERTIES VERSION 4.2.0 SOVERSION 4)

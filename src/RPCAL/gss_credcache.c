@@ -52,10 +52,10 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
-#include <gssapi/gssapi.h>
+#include <GSS/gssapi.h>
 #include <rpc/rpc.h>
 #if defined(HAVE_KRB5) && !defined(GSS_C_NT_HOSTBASED_SERVICE)
-#include <gssapi/gssapi_generic.h>
+#include <GSS/gssapi_generic.h>
 #define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
 #endif
 #ifdef HAVE_UNISTD_H
@@ -79,10 +79,10 @@
 #include <ctype.h>
 #include <errno.h>
 #include <time.h>
-#include <gssapi/gssapi.h>
+#include <GSS/gssapi.h>
 #include <limits.h>
 #ifdef USE_PRIVATE_KRB5_FUNCTIONS
-#include <gssapi/gssapi_krb5.h>
+#include <GSS/gssapi_krb5.h>
 #endif
 #include <krb5.h>
 #include <rpc/auth_gss.h>

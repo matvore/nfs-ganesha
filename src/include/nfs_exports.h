@@ -40,8 +40,8 @@
 #include <sys/param.h>
 
 #ifdef _HAVE_GSSAPI
-#include <gssapi/gssapi.h>
-#include <gssapi/gssapi_krb5.h>
+#include <GSS/gssapi.h>
+#include <GSS/gssapi_krb5.h>
 #endif
 
 #include "config_parsing.h"

@@ -864,6 +864,7 @@ gid_t ganesha_gid;
 int ganesha_ngroups;
 gid_t *ganesha_groups;
 
+#if !defined(__APPLE__)
 void fsal_set_credentials(const struct user_cred *creds)
 {
 	if (set_threadgroups(creds->caller_glen, creds->caller_garray) != 0)
@@ -932,5 +933,6 @@ void fsal_restore_ganesha_credentials(void)
 	if (set_threadgroups(ganesha_ngroups, ganesha_groups) != 0)
 		LogFatal(COMPONENT_FSAL, "Could not set Ganesha credentials");
 }
+#endif
 
 /** @} */

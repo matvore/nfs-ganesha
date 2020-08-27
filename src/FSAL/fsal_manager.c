@@ -164,7 +164,7 @@ void start_fsals(void)
  * Enforced filename for FSAL library objects.
  */
 
-static const char *pathfmt = "%s/libfsal%s.so";
+static const char *pathfmt = "%s/libfsal%s.dylib";
 
 /**
  * @brief Load the fsal's shared object.

@@ -57,32 +57,35 @@ struct {
 	int m_flag;
 	const char *m_option;
 } mntoptions[] = {
-	{
-	MNT_ASYNC, "async"}, {
-	MNT_NOATIME, "noatime"}, {
-	MNT_NOEXEC, "noexec"}, {
-	MNT_NOSUID, "nosuid"}, {
-	MNT_NOSYMFOLLOW, "nosymfollow"}, {
-	MNT_SYNCHRONOUS, "sync"}, {
-	MNT_UNION, "union"}, {
-	MNT_NOCLUSTERR, "noclusterr"}, {
-	MNT_NOCLUSTERW, "noclusterw"}, {
-	MNT_SUIDDIR, "suiddir"},
+	{MNT_ASYNC, "async"},
+	{MNT_NOATIME, "noatime"},
+	{MNT_NOEXEC, "noexec"},
+	{MNT_NOSUID, "nosuid"},
+#ifdef MNT_NOSYMFOLLOW
+	{MNT_NOSYMFOLLOW, "nosymfollow"},
+#endif
+	{MNT_SYNCHRONOUS, "sync"},
+	{MNT_UNION, "union"},
+#ifdef MNT_NOCLUSTERR
+	{MNT_NOCLUSTERR, "noclusterr"},
+#endif
+#ifdef MNT_NOCLUSTERW
+	{MNT_NOCLUSTERW, "noclusterw"},
+#endif
+#ifdef MNT_SUIDDIR
+	{MNT_SUIDDIR, "suiddir"},
+#endif
 #ifdef MNT_SNAPSHOT
-	{
-	MNT_SNAPSHOT, "snapshot"},
+	{MNT_SNAPSHOT, "snapshot"},
 #endif
 #ifdef MNT_MULTILABEL
-	{
-	MNT_MULTILABEL, "multilabel"},
+	{MNT_MULTILABEL, "multilabel"},
 #endif
 #ifdef MNT_ACLS
-	{
-	MNT_ACLS, "acls"},
+	{MNT_ACLS, "acls"},
 #endif
 #ifdef MNT_NODEV
-	{
-	MNT_NODEV, "nodev"},
+	{MNT_NODEV, "nodev"},
 #endif
 };
 

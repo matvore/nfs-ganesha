@@ -3,6 +3,7 @@ add_definitions(
   -D_GNU_SOURCE
 )
 
+
 if(USE_DBUS)
   include_directories(
     ${DBUS_INCLUDE_DIRS}
@@ -169,9 +170,9 @@ if(USE_9P_RDMA)
 endif(USE_9P_RDMA)
 
 if(SANITIZE_ADDRESS)
-	set_target_properties(ganesha_nfsd PROPERTIES LINK_FLAGS "-Wl,--version-script=${CMAKE_SOURCE_DIR}/MainNFSD/libganesha_nfsd.ver")
+	set_target_properties(ganesha_nfsd PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/MainNFSD/libganesha_nfsd.ver")
 else(SANITIZE_ADDRESS)
-	set_target_properties(ganesha_nfsd PROPERTIES LINK_FLAGS "-Wl,--version-script=${CMAKE_SOURCE_DIR}/MainNFSD/libganesha_nfsd.ver -Wl,--no-undefined")
+	set_target_properties(ganesha_nfsd PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/MainNFSD/libganesha_nfsd.ver")
 endif(SANITIZE_ADDRESS)
 
 set_target_properties(ganesha_nfsd PROPERTIES

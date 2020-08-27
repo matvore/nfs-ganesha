@@ -797,7 +797,9 @@ static void nfs_Init(const nfs_start_info_t *p_start_info)
 		"NFSv4 pseudo file system successfully initialized");
 
 	/* Save Ganesha thread credentials with Frank's routine for later use */
+#ifndef __APPLE__
 	fsal_save_ganesha_credentials();
+#endif
 
 	/* RPC Initialisation - exits on failure */
 	nfs_Init_svc();

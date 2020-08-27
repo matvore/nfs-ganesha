@@ -53,13 +53,14 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/statvfs.h>
-#if __FreeBSD__
+#if __FreeBSD__ || defined(__APPLE__)
 #include <sys/mount.h>
 #else
 #include <sys/vfs.h>
 #endif
 #include <os/quota.h>
 
+#define commonlib 1
 #include "common_utils.h"
 #ifdef HAVE_MNTENT_H
 #include <mntent.h>
@@ -939,7 +940,11 @@ int change_fsid_type(struct fsal_filesystem *fs,
 
 static bool posix_get_fsid(struct fsal_filesystem *fs, struct stat *mnt_stat)
 {
+#if defined(__APPLE__)
+	struct statvfs stat_fs;
+#else
 	struct statfs stat_fs;
+#endif
 #ifdef USE_BLKID
 	char *dev_name;
 	char *uuid_str;
@@ -948,12 +953,16 @@ static bool posix_get_fsid(struct fsal_filesystem *fs, struct stat *mnt_stat)
 	LogFullDebug(COMPONENT_FSAL, "statfs of %s pathlen %d", fs->path,
 		     fs->pathlen);
 
+#if defined(__APPLE__)
+	if (statvfs(fs->path, &stat_fs) != 0)
+#else
 	if (statfs(fs->path, &stat_fs) != 0)
+#endif
 		LogCrit(COMPONENT_FSAL,
 			"stat_fs of %s resulted in error %s(%d)",
 			fs->path, strerror(errno), errno);
 
-#if __FreeBSD__
+#if __FreeBSD__ || defined(__APPLE__)
 	fs->namelen = stat_fs.f_namemax;
 #else
 	fs->namelen = stat_fs.f_namelen;
@@ -1017,6 +1026,9 @@ out:
 #if __FreeBSD__
 	fs->fsid.major = (unsigned int) stat_fs.f_fsid.val[0];
 	fs->fsid.minor = (unsigned int) stat_fs.f_fsid.val[1];
+#elif defined(__APPLE__)
+	fs->fsid.major = stat_fs.f_fsid;
+	fs->fsid.minor = 0;
 #else
 	fs->fsid.major = (unsigned int) stat_fs.f_fsid.__val[0];
 	fs->fsid.minor = (unsigned int) stat_fs.f_fsid.__val[1];
@@ -3124,11 +3136,11 @@ bool check_verifier_stat(struct stat *st, fsal_verifier_t verifier)
 		     "Passed verifier %"PRIx32" %"PRIx32
 		     " file verifier %"PRIx32" %"PRIx32,
 		     verf_hi, verf_lo,
-		     (uint32_t) st->st_atim.tv_sec,
-		     (uint32_t) st->st_mtim.tv_sec);
+		     (uint32_t) st->st_atimespec.tv_sec,
+		     (uint32_t) st->st_mtimespec.tv_sec);
 
-	return st->st_atim.tv_sec == verf_hi &&
-	       st->st_mtim.tv_sec == verf_lo;
+	return st->st_atimespec.tv_sec == verf_hi &&
+	       st->st_mtimespec.tv_sec == verf_lo;
 }
 
 /**

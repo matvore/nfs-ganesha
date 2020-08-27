@@ -351,6 +351,7 @@ static inline int32_t nfs_clid_connected_socket(nfs_client_id_t *clientid,
 	default:
 		return EINVAL;
 	}
+	clientid->cid_cb.v40.cb_addr.ss.ss_len = sock_size;
 
 	nfd = socket(domain, sock_type, protocol);
 	if (nfd < 0) {

@@ -71,12 +71,10 @@ extern size_t gsh_strnlen(const char *s, size_t max);
 #endif
 
 #if defined(__APPLE__)
-#define clock_gettime(a, ts) portable_clock_gettime(ts)
-extern int portable_clock_gettime(struct timespec *ts);
 #define pthread_yield() pthread_yield_np()
 #undef SCANDIR_CONST
 #define SCANDIR_CONST
-#undef HAVE_MNTENT_H
+/* #undef HAVE_MNTENT_H */
 #endif
 
 #if defined(__FreeBSD__)

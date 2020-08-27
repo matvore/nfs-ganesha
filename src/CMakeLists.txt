@@ -105,13 +105,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   endif( ${SYS_RELEASE} MATCHES "Red Hat" )
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(FREEBSD ON)
   set(UNIX ON)
 # On FreeBSD libc doesn't directly provide libexecinfo, so we have to find it
-  set(USE_EXECINFO ON)
+  # set(USE_EXECINFO ON)
   set(LIBEXECDIR "/${CMAKE_INSTALL_PREFIX}/libexec")
-endif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(WINDOWS ON)
@@ -167,7 +167,7 @@ if (FREEBSD)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -ggdb")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-optimize-sibling-calls")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-dynamic")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-export_dynamic")
     set(OS_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include/os/freebsd")
     find_library(LIBDL c)  # libc suffices on freebsd
 endif(FREEBSD)
@@ -238,10 +238,14 @@ goption(USE_FSAL_NULL "build NULL FSAL shared library" ON)
 goption(USE_FSAL_RGW "build RGW FSAL shared library" ON)
 goption(USE_FSAL_MEM "build Memory FSAL shared library" ON)
 
+message("TIRPC_EPOLL = ${TIRPC_EPOLL}")
+
 # nTIRPC
 option(USE_SYSTEM_NTIRPC "Use the system nTIRPC, rather than the submodule" OFF)
 option (USE_GSS "enable RPCSEC_GSS support" ON)
 option(TIRPC_EPOLL "platform supports EPOLL or emulation" ON)
+
+message("TIRPC_EPOLL = ${TIRPC_EPOLL}")
 
 # Build configure options
 goption(USE_DBUS "enable DBUS protocol support" ON)
@@ -1086,6 +1090,7 @@ else (USE_SYSTEM_NTIRPC)
   # Set options for submodule
   set(USE_RPC_RDMA ${USE_NFS_RDMA} CACHE BOOL "Use RDMA")
   set(TIRPC_EPOLL ${TIRPC_EPOLL} CACHE BOOL "Use EPOLL")
+  message("asdf TIRPC_EPOLL = ${TIRPC_EPOLL}")
   set(USE_GSS ${USE_GSS} CACHE BOOL "Use GSS")
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 	  "${CMAKE_SOURCE_DIR}/libntirpc/cmake/modules/")
@@ -1100,10 +1105,18 @@ endif (USE_SYSTEM_NTIRPC)
 message(${NTIRPC_INCLUDE_DIR})
 include_directories(${NTIRPC_INCLUDE_DIR})
 
-find_library(LIBURCU urcu-bp)
-if (NOT LIBURCU)
+find_library(LIBURCU_LIB urcu-bp)
+if (NOT LIBURCU_LIB)
 	message(FATAL_ERROR "userspace-rcu library not found!")
-endif(NOT LIBURCU)
+endif(NOT LIBURCU_LIB)
+
+find_path(LIBURCU_INC urcu-bp.h)
+if (NOT LIBURCU_INC)
+	message(FATAL_ERROR "userspace-rcu includes not found!")
+endif(NOT LIBURCU_INC)
+
+message("LIBURCU_INC ${LIBURCU_INC}")
+
 if (CMAKE_MAJOR_VERSION VERSION_EQUAL 3 AND CMAKE_MINOR_VERSION VERSION_GREATER 14)
   include(CheckSymbolExists)
 endif(CMAKE_MAJOR_VERSION VERSION_EQUAL 3 AND CMAKE_MINOR_VERSION VERSION_GREATER 14)
@@ -1116,9 +1129,11 @@ set(SYSTEM_LIBRARIES
   ${LIBDL}
   ${KRB5_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
-  ${LIBRT}
-  ${LIBURCU}
+#  ${LIBRT}
+  ${LIBURCU_LIB}
 )
+
+include_directories(${LIBURCU_INC})
 
 # Config file; make sure it doesn't clobber an existing one
 include(${CMAKE_SOURCE_DIR}/cmake/modules/InstallPackageConfigFile.cmake)
@@ -1543,7 +1558,7 @@ target_link_libraries(ganesha.nfsd
   ${LIBTIRPC_LIBRARIES}
   ${SYSTEM_LIBRARIES}
   ${LTTNG_LIBRARIES}
-  "-Wl,--no-undefined"
+  
 )
 set_target_properties(ganesha.nfsd PROPERTIES COMPILE_FLAGS "-fPIC")
 install(TARGETS ganesha.nfsd COMPONENT daemon DESTINATION bin)
@@ -1557,7 +1572,7 @@ if (USE_RADOS_RECOV)
   target_link_libraries(ganesha-rados-grace
     ganesha_nfsd
     ${RADOS_LIBRARIES}
-    "-Wl,--no-undefined"
+    
   )
   install(TARGETS ganesha-rados-grace COMPONENT tools DESTINATION bin)
 endif(USE_RADOS_RECOV)
@@ -1574,7 +1589,7 @@ if(LINUX)
     ${LIBTIRPC_LIBRARIES}
     ${SYSTEM_LIBRARIES}
     ${LTTNG_LIBRARIES}
-    "-Wl,--no-undefined"
+    
   )
 
   if( USE_ADMIN_TOOLS )
@@ -1592,7 +1607,7 @@ target_link_libraries(verif_syntax
   ${LIBTIRPC_LIBRARIES}
   ${SYSTEM_LIBRARIES}
   ${LTTNG_LIBRARIES}
-  "-Wl,--no-undefined"
+  
 )
 
 ########### next target ###############
@@ -1605,7 +1620,7 @@ target_link_libraries(test_parsing
   ${LIBTIRPC_LIBRARIES}
   ${SYSTEM_LIBRARIES}
   ${LTTNG_LIBRARIES}
-  "-Wl,--no-undefined"
+  
 )
 
 ########### add a "make doc" target to call Doxygen

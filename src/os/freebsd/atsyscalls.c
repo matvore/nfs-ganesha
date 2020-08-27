@@ -32,7 +32,9 @@
 #include <sys/syscall.h>
 #include "syscalls.h"
 #include <sys/types.h>
+#if !defined(__APPLE__)
 #include <sys/module.h>
+#endif
 
 #if __FreeBSD_cc_version  >= 800001
 /* Fllowing syscalls are not yet implemented in vanilla FreeBSD kernels  */

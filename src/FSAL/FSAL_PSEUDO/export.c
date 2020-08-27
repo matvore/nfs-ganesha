@@ -165,8 +165,8 @@ static fsal_status_t wire_to_host(struct fsal_export *exp_hdl,
 	len = (ushort *)((char *)hashkey + sizeof(uint64_t));
 	if (flags & FH_FSAL_BIG_ENDIAN) {
 #if (BYTE_ORDER != BIG_ENDIAN)
-		*len = bswap_16(*len);
-		*hashkey = bswap_64(*hashkey);
+		*len = __builtin_bswap16(*len);
+		*hashkey = __builtin_bswap64(*hashkey);
 #endif
 	} else {
 #if (BYTE_ORDER == BIG_ENDIAN)

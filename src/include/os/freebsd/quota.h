@@ -25,6 +25,7 @@
 #ifndef QUOTA_FREEBSD_H
 #define QUOTA_FREEBSD_H
 
+#if !defined(__APPLE__)
 #include <ufs/ufs/quota.h>
 
 #define QUOTACTL(cmd, path, id, addr) \
@@ -51,5 +52,7 @@ struct dqblk_os {
 #endif
 
 #define dqblk dqblk_os
+
+#endif
 
 #endif /* QUOTA_FREEBSD_H */

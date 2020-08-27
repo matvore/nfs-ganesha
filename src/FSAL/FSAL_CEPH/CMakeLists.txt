@@ -30,7 +30,6 @@ target_link_libraries(fsalceph
   ${CEPHFS_LIBRARIES}
   ${SYSTEM_LIBRARIES}
   ${LTTNG_LIBRARIES}
-  "-Wl,--no-undefined"
 )
 
 set_target_properties(fsalceph PROPERTIES VERSION 4.2.0 SOVERSION 4)

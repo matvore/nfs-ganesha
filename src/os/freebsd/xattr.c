@@ -25,6 +25,8 @@
  * VFS FSAL xattr support on FreeBSD platform
  */
 
+#ifndef __APPLE__
+
 #include <os/freebsd/xattr.h>
 #include <limits.h>
 #include <sys/extattr.h>
@@ -69,3 +71,5 @@ ssize_t fremovexattr(int fd, const char *name)
 {
 	return extattr_delete_fd(fd, EXTATTR_NAMESPACE_SYSTEM, name);
 }
+
+#endif

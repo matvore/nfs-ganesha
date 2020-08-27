@@ -30,7 +30,7 @@
 
 #ifdef LINUX
 #include <mntent.h>
-#elif FREEBSD
+#elif FREEBSD || defined(__APPLE__)
 #include <os/freebsd/mntent.h>
 #endif
 

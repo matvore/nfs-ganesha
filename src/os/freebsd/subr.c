@@ -32,12 +32,16 @@
 #include <string.h>
 #include <os/subr.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <log.h>
 #include "syscalls.h"
+#if !defined(__APPLE__)
 #include <sys/module.h>
+#endif
 
+#if !defined(__APPLE__)
 /**
  * @brief Read system directory entries into the buffer
  *
@@ -46,10 +50,11 @@
  * @param[in]     bcount Buffer size
  * @param[in,out] basepp Offset into "file" after this read
  */
-int vfs_readents(int fd, char *buf, unsigned int bcount, off_t *basepp)
+int vfs_readents(int fd, char *buf, unsigned int bcount, struct seekloc *sl)
 {
-	return getdirentries(fd, buf, bcount, basepp);
+	return getdirentries(fd, buf, bcount, &sl->loc);
 }
+#endif
 
 /**
  * @brief Mash a FreeBSD directory entry into the generic form
@@ -83,34 +88,34 @@ bool to_vfs_dirent(char *buf, int bpos, struct vfs_dirent *vd, off_t base)
  * timespec <--> timeval conversion.
  */
 
+#ifndef TIMEVAL_TO_TIMESPEC
 #define TIMEVAL_TO_TIMESPEC(tv, ts)                                     \
 	do {                                                            \
 		(ts)->tv_sec = (tv)->tv_sec;                            \
 		(ts)->tv_nsec = (tv)->tv_usec * 1000;                   \
 	} while (0)
+#endif
 
+#ifndef TIMESPEC_TO_TIMEVAL
 #define TIMESPEC_TO_TIMEVAL(tv, ts)                                     \
 	do {                                                            \
 		(tv)->tv_sec = (ts)->tv_sec;                            \
 		(tv)->tv_usec = (ts)->tv_nsec / 1000;                   \
 	} while (0)
+#endif
 
 int vfs_utimesat(int fd, const char *path, const struct timespec ts[2],
 		 int flags)
 {
-	struct timeval tv[2];
-
 	if (ts[0].tv_nsec == UTIME_OMIT || ts[1].tv_nsec == UTIME_OMIT) {
 		/* nothing to do */
 		return 0;
 	} else if (ts[0].tv_nsec == UTIME_NOW || ts[1].tv_nsec == UTIME_NOW) {
 		/* set to the current timestamp. achieve this by passing NULL
 		 * timeval to kernel */
-		return futimesat(fd, (char *)path, NULL);
+		return utimensat(fd, path, NULL, flags);
 	}
-	TIMESPEC_TO_TIMEVAL(&tv[0], &ts[0]);
-	TIMESPEC_TO_TIMEVAL(&tv[1], &ts[1]);
-	return futimesat(fd, (char *)path, tv);
+	return utimensat(fd, path, ts, flags);
 }
 
 int vfs_utimes(int fd, const struct timespec *ts)
@@ -130,6 +135,7 @@ int vfs_utimes(int fd, const struct timespec *ts)
 	return futimes(fd, tv);
 }
 
+#ifndef __APPLE__
 static int setthreaduid(uid_t uid)
 {
 	int mod, err;
@@ -201,16 +207,6 @@ static int setthreadgroups(size_t size, const gid_t *list)
 	return syscall(syscall_num, size, list);
 }
 
-uid_t getuser(void)
-{
-	return geteuid();
-}
-
-gid_t getgroup(void)
-{
-	return getegid();
-}
-
 void setuser(uid_t uid)
 {
 	int rc = setthreaduid(uid);
@@ -234,4 +230,15 @@ void setgroup(gid_t gid)
 int set_threadgroups(size_t size, const gid_t *list)
 {
 	return setthreadgroups(size, list);
+}
+#endif
+
+uid_t getuser(void)
+{
+	return geteuid();
+}
+
+gid_t getgroup(void)
+{
+	return getegid();
 }
