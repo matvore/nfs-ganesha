@@ -1683,6 +1683,18 @@ size_t mdcache_lru_release_entries(int32_t want_release)
 	return released;
 }
 
+static bool get_open_file_limit(struct rlimit *rlim)
+{
+	if (getrlimit(RLIMIT_NOFILE, rlim) != 0)
+		return false;
+
+#if defined(__APPLE__)
+	rlim->rlim_max = OPEN_MAX;
+#endif
+
+	return true;
+}
+
 void init_fds_limit(void)
 {
 	int code = 0;
@@ -1693,7 +1705,7 @@ void init_fds_limit(void)
 	};
 
 	/* Find out the system-imposed file descriptor limit */
-	if (getrlimit(RLIMIT_NOFILE, &rlim) != 0) {
+	if (!get_open_file_limit(&rlim)) {
 		code = errno;
 		LogCrit(COMPONENT_CACHE_INODE_LRU,
 			"Call to getrlimit failed with error %d. This should not happen.  Assigning default of %d.",
